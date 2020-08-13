@@ -1,0 +1,204 @@
+\documentclass[10pt]{article}
+\usepackage[english]{babel} % Language to be used
+\usepackage{natbib}
+\usepackage{url}
+\usepackage{hyperref}
+\usepackage{listings}
+\usepackage[usenames,dvipsnames]{color}    
+
+\hypersetup{
+  pdftitle={Python Tips \#1},
+  pdfauthor={Wim R.M. Cardoen},
+  pdfpagelayout=SinglePage,
+  bookmarks=false,
+  citecolor=black,
+  colorlinks=true,
+  linkcolor=black
+}
+\urlstyle{same}
+
+\lstset{basicstyle=\ttfamily,
+  tabsize=2,
+  frame=single,
+  showstringspaces=false,
+  showspaces=false,
+  showtabs=false,
+  captionpos=b,
+  breaklines=true,
+  breakatwhitespace=false,        % sets if automatic breaks should only happen at whitespace
+  keywordstyle=\color{RoyalBlue},      % keyword style
+  commentstyle=\color{ForestGreen},   % comment style
+  stringstyle=\color{ForestGreen}   
+}
+
+% Parameters to the margins 
+\setlength{\topmargin}{-0.50in}
+\setlength{\oddsidemargin}{-0.25in}
+\setlength{\evensidemargin}{-0.25in}
+\setlength{\textwidth}{7.0in}
+\setlength{\textheight}{9.00in}
+
+
+\begin{document}
+\title{\centering{Python Tips \#1}}
+\author{Wim R.M. Cardoen \\ Email: \$(prefix)[at]gmail[dot]com \\ where \\ prefix='wcardoen' }
+\date{\today}
+\maketitle
+\thispagestyle{empty}
+% ----------------------------------------------------------------
+\pagestyle{plain}
+\pagenumbering{arabic} 
+\setcounter{page}{1}
+\renewcommand \thesection{\Roman{section}} 
+
+The code snippets below require Python\,$>=3.8$. 
+
+The snippets can be downloaded from 
+\href{https://github.com/wcardoen/python-reflections.git}{https://github.com/wcardoen/python-reflections}.
+
+
+\begin{itemize}
+	\item F-strings:\newline		
+The \lstinline[language=python]{format} method for the string class 
+has been around since Python\,$2.7$. 
+This is a familiar pattern for languages of which the syntax has been modelled on
+the C language.
+\begin{lstlisting}[language=python] 
+# Example 1: format method since Python 2.7
+artist={"von Beethoven":"Bonn",
+        "de Balzac":"Tours",
+        "van Eyck":"Maaseik",
+        "Alighieri":"Firenze"}
+for person in artist.keys():
+    print("{0:>13} was born in {1}".format(person,artist[person]))
+\end{lstlisting}
+
+The aforementioned lines results in the following output:
+\begin{verbatim}
+von Beethoven was born in Bonn
+    de Balzac was born in Tours
+     van Eyck was born in Maaseik
+    Alighieri was born in Firenze
+\end{verbatim}
+
+In Python\,$3.6$ the formatted string literal (\textbf{f-string}) was introduced.
+In an f-string the following modifications have been applied to a regular string (and its \lstinline[language=python]{format} method):
+\begin{enumerate}
+	\item the \lstinline[language=python]{format} method applied to the regular string is omitted.
+	\item the regular string must be prefixed by the '\textbf{f}' or '\textbf{F}' character.
+        \item the indices referring to variables in the format method are replaced by the variables as such.	
+\end{enumerate}
+Therefore, the introduction of the f-string makes codes shorter and more readable.
+
+\begin{lstlisting}[language=python]
+# Example 1: use of f-strings (iter 1)
+for person in artist.keys():
+    print(f"{person:>13} was born in {artist[person]}")
+\end{lstlisting} 
+
+The format specifiers can also contain evaluated expressions:
+\begin{lstlisting}[language=python]
+# Example 1: use of f-strings (iter 2)
+WIDTH = max(( len(item) for item in artist.keys()))
+for person in artist.keys():
+    print(f"{person:>{WIDTH}} was born in {artist[person]}")
+\end{lstlisting}
+
+
+Since \href{https://docs.python.org/3.8/whatsnew/3.8.html}{Python\,$3.8$} f-strings support the '\textbf{=}' character for self-documenting expressions and debugging.
+The f-string \lstinline[language=python]|f"{expr=}"| will print the string 'expr=' and suffix it with the evaluated value of the expression 'expr'.
+
+\begin{lstlisting}[language=python]
+# Example 2: Self-documenting expression (iter 1)
+from math import cos, pi
+print(f" {cos(pi/4.0)=}")
+\end{lstlisting}
+
+This results into the following output:
+\begin{verbatim}
+ cos(pi/4.0)=0.7071067811865476
+\end{verbatim}
+
+Applying a format specifier to the previous example:
+\begin{lstlisting}[language=python]
+# Example 2: Self-documenting expression using a format specifier (iter 2)
+WIDTH=10
+PRECISION=4
+from math import cos, pi
+print(f" {cos(pi/4.0)=:{WIDTH}.{PRECISION}}")
+\end{lstlisting}
+We now get:
+\begin{verbatim}
+ cos(pi/4.0)=    0.7071
+\end{verbatim}
+
+For more info: \href{https://www.python.org/dev/peps/pep-0498/}{PEP-$0498$}.
+
+\item Chaining of comparison operators:\newline
+
+Let $X:=\{ x_1,\,x_2,\,x_3,\, \ldots,\,x_n \}$ be the set of Python expressions and $P:=\{ \widehat{op_1}, \,\widehat{op_2}, \, \ldots, \, \widehat{op_{n-1}} \}$
+be the set of Python comparison operators \footnote{The Python language has the following comparison operators:\lstinline[language=python]{<,>,==,>=,<=,!=,is (not), (not) in}} applied to $X$.
+
+The compound logical expression:
+\begin{center}
+$x_1 \; \widehat{op_1} \; x_2$ \lstinline[language=python]{and}
+               $x_2 \; \widehat{op_2} \; x_3$ \lstinline[language=python]{and} $ \ldots$  \lstinline[language=python]{and}
+$       x_{(n-1)} \; \widehat{op_{(n-1)}} \; x_n $ \newline
+\end{center}
+and
+\begin{equation}
+	x_1 \; \widehat{op_1} \; x_2  \; \widehat{op_2} \; x_3  \; \widehat{op_3} \; \ldots \; \widehat{op_{(n-1)}} \; x_n
+\end{equation}	
+are equivalent in the Python language.
+
+Example $1$::
+\begin{lstlisting}[language=python]
+a,b,c=5,3,7
+print(f"{a<b<c=}")
+# Equivalent to: (a<b) and (b<c)
+#                FALSE and TRUE => FALSE
+\end{lstlisting}
+which returns:
+\begin{verbatim}
+a<b<c=False
+\end{verbatim}
+
+
+Example $2$::
+\begin{lstlisting}[language=python]
+print(f"{15%4==3>2=}")
+# Equivalent to: (15%4==3) and (3>2)
+#            or:  TRUE     and TRUE => TRUE
+\end{lstlisting}
+which returns:
+\begin{verbatim}
+15%4==3>2=True
+\end{verbatim}
+
+
+Example $3$::
+\begin{lstlisting}[language=python]
+lstA=[[1,2],["hello","world"]]
+lstB=lstA
+lstB[1][0]="HELLO"
+lstC=lstB[:]
+print(f"{lstA is lstB is lstC=}")
+print(f"{lstA == lstB == lstC=}")
+# Equivalent to: (lstA is lstB) and (lstB is lstC)
+#            or: TRUE and FALSE => FALSE
+# Equivalent to: (lstA == lstB) and (lstB == lstC)
+#            or: TRUE and TRUE => TRUE
+\end{lstlisting}
+which returns:
+\begin{verbatim}
+lstA is lstB is lstC=False
+lstA == lstB == lstC=True
+\end{verbatim}
+
+\end{itemize}
+
+% ----------------------------------------------------------------
+\bibliographystyle{alpha}
+\bibliography{ana}
+\end{document}
+% ----------------------------------------------------------------

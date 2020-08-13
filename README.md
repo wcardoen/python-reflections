@@ -1,2 +1,2 @@
 # python-reflections
-Reflections, tips, python tricks
+Reflections, tips, tricks on the Python Language
