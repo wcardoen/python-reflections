@@ -1,4 +1,5 @@
 import itertools as it
+import pre
 
 a= ['a','b','c']
 b= ['x','y','z']
