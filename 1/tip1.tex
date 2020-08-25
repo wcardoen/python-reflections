@@ -51,9 +51,9 @@
 \setcounter{page}{1}
 \renewcommand \thesection{\Roman{section}} 
 
-The code snippets below require Python\,$>=3.8$. 
-
-The snippets can be downloaded from 
+In the following paragraphs we discuss some Python tricks.
+All code snippets below require Python\,$>=3.8$.  
+They can be downloaded from the following location:\newline
 \href{https://github.com/wcardoen/python-reflections.git}{https://github.com/wcardoen/python-reflections}.
 
 
@@ -195,8 +195,98 @@ lstA is lstB is lstC=False
 lstA == lstB == lstC=True
 \end{verbatim}
 
-\end{itemize}
+\item The \lstinline[language=python]{itertools} module:\newline
+The \lstinline[language=python]{enumerate} method generates the indices and values of an iterable's elements.
+\begin{lstlisting}[language=python]
+a= ['a','b','c']
+b= ['x','y','z']
+c= [10,100]
+# enumerate: returns indices and el.
+for index, item in enumerate(b):
+    print(f"  El. with {index=} is {item=}")
+\end{lstlisting}
+\begin{verbatim}
+  El. with index=0 is item='x'
+  El. with index=1 is item='y'
+  El. with index=2 is item='z'
+\end{verbatim} 
 
+Python's \lstinline[language=python]{zip} function generates an iterable of tuples
+which is derived from its constituent iterables. The newly created iterable ends as soon as
+one of its constituent iterables is exhausted.
+\begin{lstlisting}[language=python]
+for item in zip(a,b,c):
+    print(f"  {item=}")
+\end{lstlisting}
+\begin{verbatim} 
+  item=('a', 'x', 10)
+  item=('b', 'y', 100)
+\end{verbatim}
+
+The \lstinline[language=python]{zip} method allows the extension of 
+\lstinline[language=python]{enumerate} to several iterables:
+\begin{lstlisting}[language=python]
+for item in zip(range(len(b)),b,c):
+    print(f"  {item=}")
+\end{lstlisting}
+\begin{verbatim}
+  item=(0, 'x', 10)
+  item=(1, 'y', 100)
+\end{verbatim}  
+
+Python's \lstinline[language=python]{itertools} module covers a wide range of functionality.
+The following 2 examples use functions from this \href{https://docs.python.org/3/library/itertools.html#module-itertools}{module}.
+
+The function \lstinline[language=python]{zip_longest} generates (like \lstinline[language=python]{zip}) 
+an interable of tuples derived from its constituent
+iterables. The new created iterable is exhausted when its \textbf{longest} constituent iterable is exhausted.
+The "empty" elements are filled up with \lstinline[language=python]{None}.
+\begin{lstlisting}[language=python]
+import itertools as it
+for item in it.zip_longest(a,b,c):
+    print(f"  {item=}")
+\end{lstlisting}
+\begin{verbatim}
+  item=('a', 'x', 10)
+  item=('b', 'y', 100)
+  item=('c', 'z', None)
+\end{verbatim}
+
+The \lstinline[language=python]{product} function generates a Cartesian product iterable based on its constituent iterables.
+\begin{lstlisting}[language=python]
+s = it.product(a,b,c)
+for item in s:
+    print(f"  {item=}")
+\end{lstlisting}
+\begin{verbatim}
+  item=('a', 'x', 10)
+  item=('a', 'x', 100)
+  item=('a', 'y', 10)
+  item=('a', 'y', 100)
+  item=('a', 'z', 10)
+  item=('a', 'z', 100)
+  item=('b', 'x', 10)
+  item=('b', 'x', 100)
+  item=('b', 'y', 10)
+  item=('b', 'y', 100)
+  item=('b', 'z', 10)
+  item=('b', 'z', 100)
+  item=('c', 'x', 10)
+  item=('c', 'x', 100)
+  item=('c', 'y', 10)
+  item=('c', 'y', 100)
+  item=('c', 'z', 10)
+  item=('c', 'z', 100)
+\end{verbatim} 
+Note that the result of the last block code can also be generated using the following tuple comprehension: 
+\begin{lstlisting}[language=python]
+s= ((x,y,z) for x in a for y in b for z in c)
+for item in s:
+    print(f"  {item=}")
+\end{lstlisting}
+
+
+\end{itemize}
 % ----------------------------------------------------------------
 \bibliographystyle{alpha}
 \bibliography{ana}
