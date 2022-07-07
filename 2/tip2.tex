@@ -1,0 +1,263 @@
+\documentclass[10pt]{article}
+\usepackage[english]{babel} % Language to be used
+\usepackage{natbib}
+\usepackage{url}
+\usepackage{hyperref}
+\usepackage{listings}
+\usepackage{amsfonts}
+\usepackage[usenames,dvipsnames]{color}    
+
+\hypersetup{
+  pdftitle={Python Tips \#2},
+  pdfauthor={Wim R.M. Cardoen},
+  pdfpagelayout=SinglePage,
+  bookmarks=false,
+  citecolor=black,
+  colorlinks=true,
+  linkcolor=black
+}
+\urlstyle{same}
+
+\lstset{basicstyle=\ttfamily,
+  tabsize=2,
+  frame=single,
+  showstringspaces=false,
+  showspaces=false,
+  showtabs=false,
+  captionpos=b,
+  breaklines=true,
+  breakatwhitespace=false,        % sets if automatic breaks should only happen at whitespace
+  keywordstyle=\color{RoyalBlue},      % keyword style
+  commentstyle=\color{ForestGreen},   % comment style
+  stringstyle=\color{ForestGreen}   
+}
+
+% Parameters to the margins 
+\setlength{\topmargin}{-0.50in}
+\setlength{\oddsidemargin}{-0.25in}
+\setlength{\evensidemargin}{-0.25in}
+\setlength{\textwidth}{7.0in}
+\setlength{\textheight}{9.00in}
+
+
+\begin{document}
+\title{\centering{Python Tips \#2}}
+\author{Wim R.M. Cardoen \\ Email: \$(prefix)[at]gmail[dot]com \\ where \\ prefix='wcardoen' }
+\date{\today}
+\maketitle
+\thispagestyle{empty}
+% ----------------------------------------------------------------
+\pagestyle{plain}
+\pagenumbering{arabic} 
+\setcounter{page}{1}
+\renewcommand \thesection{\Roman{section}} 
+
+In the following paragraphs we discuss some recent innovations in Python. 
+All code snippets were tested using Python\,$3.11.0$b$3$.
+The examples can be downloaded from the following location:\newline
+\href{https://github.com/wcardoen/python-reflections.git}{https://github.com/wcardoen/python-reflections}.
+
+
+\begin{itemize}
+	\item Match-operator:\newline
+A lot of programming languages have selection control mechanisms 
+		beyond the \lstinline[language=python]{if}, \lstinline[language=python]{elif}, \lstinline[language=python]{else} constructs. 
+		Its C counterpart is the \lstinline[language=c]{switch} construct.
+
+\begin{lstlisting}[language=python]
+# Traditional if/elif/else statements
+def find_capital(country):
+    if country == 'France':
+        return 'Paris'
+    elif country == 'Germany':
+        return 'Berlin'
+    elif country == 'Netherlands':
+        return 'Amsterdam'
+    elif country == 'Belgium':
+        return 'Brussels'
+    else:
+        return 'SORRY!'
+
+for country in ['Belgium', 'Poland']:
+    print(f"  Country:{country:>15s} -> Capital:{find_capital(country):>10s}")
+
+\end{lstlisting}
+
+The aforementioned code block results in the following output:
+\begin{verbatim}
+  Country:        Belgium -> Capital:  Brussels
+  Country:         Poland -> Capital:    SORRY!
+\end{verbatim}
+
+In Python\,$3.10$, the \lstinline[language=python]{match} construct 
+was introduced.
+\begin{lstlisting}[language=python] 
+def find_capital2(country):
+# match/case construct (Python >= 3.10)
+    match country:
+        case 'France':
+             return 'Paris'
+        case 'Germany':
+             return 'Berlin'
+        case 'Netherlands':
+             return 'Amsterdam'
+        case 'Belgium':
+             return 'Brussels'
+        case _:
+             return 'Sorry!'
+    
+for country in ['Belgium', 'Denmark']:
+    print(f"  Country:{country:>15s} -> Capital:{find_capital2(country):>10s}")
+\end{lstlisting}
+
+The aforementioned block results into:
+\begin{verbatim}
+  Country:        Belgium -> Capital:  Brussels
+  Country:        Denmark -> Capital:    Sorry!
+\end{verbatim}
+
+		You can combine several patterns using the  \lstinline[language=python]{|} (i.e.\,$\cup$ operator).
+\begin{lstlisting}[language=python]
+def find_continent(country):
+    match country:
+        case 'Belgium'|'France'|'Germany'|'Netherlands':
+            return 'Europe'
+        case 'China'|'India'|'Japan':
+            return 'Asia'
+        case _:
+            return 'Sorry!'
+for country in ['France','China','USA','India']:
+    print(f"  Country:{country:>15s} -> Continent:{find_continent(country):>10s}")
+\end{lstlisting}
+
+The above code block produces the following output:
+\begin{verbatim}
+  Country:         France -> Continent:    Europe
+  Country:          China -> Continent:      Asia
+  Country:            USA -> Continent:    Sorry!
+  Country:          India -> Continent:      Asia
+\end{verbatim}  
+
+Patterns can also be verified by unpacking:
+\begin{lstlisting}[language=python]
+def find_location(point):
+    match point:
+        case (0,0,0):
+            return "Origin"
+        case (x,0,0):
+            return "Pt. on x-axis"
+        case (0,y,0):
+            return "Pt. on y-axis"
+        case (0,0,z):
+            return "Pt. on z-axis"
+        case (x,y,0):
+            return "Pt. in the xy-plane"
+        case (x,0,z):
+            return "Pt. in the xz-plane"
+        case (0,y,z):
+            return "Pt. in the yz-plane"
+        case (x,y,z):
+            return "Reg. pt."
+        case _:
+            return "NOT a 3D-point"
+for item in [(3,4,5), [2,0,0], (0,0,0), (0,3,2), (3,4,5,6)]:
+    print(f"  Pt.:{str(item):>15s}   Type:{find_location(item)}")
+\end{lstlisting}
+
+This results into:
+\begin{verbatim}
+  Pt.:      (3, 4, 5)   Type:Reg. pt.
+  Pt.:      [2, 0, 0]   Type:Pt. on x-axis
+  Pt.:      (0, 0, 0)   Type:Origin
+  Pt.:      (0, 3, 2)   Type:Pt. in the yz-plane
+  Pt.:   (3, 4, 5, 6)   Type:NOT a 3D-point
+\end{verbatim}
+
+The match pattern construct is wide topic. Three PEPS (\href{https://peps.python.org/pep-0622}{PEP-$622$}, 
+\href{https://peps.python.org/pep-0634}{PEP-$634$}, \href{https://peps.python.org/pep-0636/}{PEP-$636$}) were written to address it.
+
+
+\item Merging of dictionaries\newline
+The merging and update of Python dictionaries has been improved in Python\,$3.9$ 
+by introducing the \lstinline[language=python]{|} and \lstinline[language=python]{|=} operators. The details are discussed in  
+\href{https://peps.python.org/pep-0584/}{\texttt{PEP-}$0584$}
+\begin{lstlisting}[language=python] 
+capitals1 = {'france':'paris', 'germany':'berlin','netherlands':'amsterdam'}
+capitals2 = {'france':'paris', 'belgium':'brussels', 'denmark':'copenhagen'}
+
+# Merging: Creation of a new dict object
+capitals3 = capitals1 | capitals2
+print(f"  capitals3:\n{capitals3}")
+
+# Update in-place operation
+capitals1 |= capitals2
+print(f"  capitals1:\n{capitals1}")
+\end{lstlisting}
+
+\begin{verbatim}
+  capitals3:
+{'france': 'paris', 'germany': 'berlin', 'netherlands': 'amsterdam', 'belgium': 'brussels', 'denmark': 'copenhagen'}
+  capitals1:
+{'france': 'paris', 'germany': 'berlin', 'netherlands': 'amsterdam', 'belgium': 'brussels', 'denmark': 'copenhagen'}
+\end{verbatim}
+
+\item Removing the prefixes/suffixes of strings\newline
+Python\,$3.9$ introduced some handy methods to remove suffixes and prefixes 
+(\href{https://peps.python.org/pep-0616/}{\texttt{PEP-}$0616$}).
+\begin{lstlisting}[language=python]
+city="Witwatersrand"
+STR1, STR2 ="Wit", "rand"
+print(f"String:'{city}'")
+print(f"  remove the prefix '{STR1}'  ->  '{city.removeprefix(STR1)}'")
+print(f"  remove the sufffix '{STR2}'  ->  '{city.removesuffix(STR2)}'")
+\end{lstlisting}
+
+\begin{verbatim}
+String:'Witwatersrand'
+  remove the prefix 'Wit'  ->  'watersrand'
+  remove the sufffix 'rand'  ->  'Witwaters'
+\end{verbatim}
+
+\item \lstinline[language=python]{math} module \newline
+The \lstinline[language=python]{math} module was extended with
+some interesting methods, among them:
+\begin{itemize}
+\item \lstinline[language=python]{math.isqrt} : returns the integer part of the square root
+\item \lstinline[language=python]{math.gcd}   : returns the Greatest Common Divisor
+\item \lstinline[language=python]{math.lcm}   : returns the Least Common Multiple
+\item \lstinline[language=python]{math.prod}  : calculates the products of the elements in a iterable
+\item \lstinline[language=python]{math.comb}  : calculates the number of combinations $n \choose k$
+\item \lstinline[language=python]{math.perm}  : calculates the number of permutations $\frac{n!}{(n-k)!}$
+\item \lstinline[language=python]{math.dist}  : calculates the euclidean distance between $p,q \,\in \mathbb{R}^n$
+\end{itemize}		
+
+\begin{lstlisting}[language=python]
+import math
+print(f"  math.isqrt(26)    :{math.isqrt(26)}")
+print(f"  math.gcd(24,12,36):{math.gcd(24,12,36)}")
+print(f"  math.lcm(2,4,6,8) :{math.lcm(2,4,6,8)}")
+print(f"  math.prod([2,3,4,5,6],start=10):{math.prod([2,3,4,5,6],start=10)}")
+print(f"  math.comb(5,2):{math.comb(5,2)}")
+print(f"  math.perm(5,2):{math.perm(5,2)}")
+p = range(1,10)
+q = range(2,11)
+print(f"  math.dist(p,q):{math.dist(p,q)}")
+\end{lstlisting}
+
+which results into:
+\begin{verbatim}
+  math.isqrt(26)    :5
+  math.gcd(24,12,36):12
+  math.lcm(2,4,6,8) :24
+  math.prod([2,3,4,5,6],start=10):7200
+  math.comb(5,2):10
+  math.perm(5,2):20
+  math.dist(p,q):3.0
+\end{verbatim}
+
+\end{itemize}
+% ----------------------------------------------------------------
+\bibliographystyle{alpha}
+\bibliography{ana}
+\end{document}
+% ----------------------------------------------------------------
