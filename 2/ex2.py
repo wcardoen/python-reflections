@@ -1,7 +1,7 @@
 #!/bin/bash
 
-capitals1 = {'france':'paris', 'germany':'berlin','netherlands':'amsterdam'}
-capitals2 = {'france':'paris', 'belgium':'brussels', 'denmark':'copenhagen'}
+capitals1 = {'france':'paris', 'germany':'berlin'}
+capitals2 = {'france':'paris', 'belgium':'brussels'}
 
 # Merging: Creation of a new dict object
 capitals3 = capitals1 | capitals2

@@ -182,8 +182,8 @@ The merging and update of Python dictionaries has been improved in Python\,$3.9$
 by introducing the \lstinline[language=python]{|} and \lstinline[language=python]{|=} operators. The details are discussed in  
 \href{https://peps.python.org/pep-0584/}{\texttt{PEP-}$0584$}
 \begin{lstlisting}[language=python] 
-capitals1 = {'france':'paris', 'germany':'berlin','netherlands':'amsterdam'}
-capitals2 = {'france':'paris', 'belgium':'brussels', 'denmark':'copenhagen'}
+capitals1 = {'france':'paris', 'germany':'berlin'}
+capitals2 = {'france':'paris', 'belgium':'brussels'}
 
 # Merging: Creation of a new dict object
 capitals3 = capitals1 | capitals2
@@ -196,9 +196,9 @@ print(f"  capitals1:\n{capitals1}")
 
 \begin{verbatim}
   capitals3:
-{'france': 'paris', 'germany': 'berlin', 'netherlands': 'amsterdam', 'belgium': 'brussels', 'denmark': 'copenhagen'}
+{'france': 'paris', 'germany': 'berlin', 'belgium': 'brussels'}
   capitals1:
-{'france': 'paris', 'germany': 'berlin', 'netherlands': 'amsterdam', 'belgium': 'brussels', 'denmark': 'copenhagen'}
+{'france': 'paris', 'germany': 'berlin', 'belgium': 'brussels'}
 \end{verbatim}
 
 \item Removing the prefixes/suffixes of strings\newline
