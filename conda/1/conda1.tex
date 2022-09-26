@@ -1,0 +1,172 @@
+\documentclass[10pt]{article}
+\usepackage[english]{babel} % Language to be used
+\usepackage{natbib}
+\usepackage{url}
+\usepackage{hyperref}
+\usepackage{listings}
+\usepackage[usenames,dvipsnames]{color}    
+
+\hypersetup{
+  pdftitle={Conda \#1},
+  pdfauthor={Wim R.M. Cardoen},
+  pdfpagelayout=SinglePage,
+  bookmarks=false,
+  citecolor=black,
+  colorlinks=true,
+  linkcolor=black
+}
+\urlstyle{same}
+
+\lstset{basicstyle=\ttfamily,
+  tabsize=2,
+  frame=single,
+  showstringspaces=false,
+  showspaces=false,
+  showtabs=false,
+  captionpos=b,
+  breaklines=true,
+  breakatwhitespace=false,        % sets if automatic breaks should only happen at whitespace
+  keywordstyle=\color{RoyalBlue},      % keyword style
+  commentstyle=\color{ForestGreen},   % comment style
+  stringstyle=\color{ForestGreen}   
+}
+
+% Parameters to the margins 
+\setlength{\topmargin}{-0.50in}
+\setlength{\oddsidemargin}{-0.25in}
+\setlength{\evensidemargin}{-0.25in}
+\setlength{\textwidth}{7.0in}
+\setlength{\textheight}{9.00in}
+
+
+\begin{document}
+\title{\centering{Conda \& Reproducibility}}
+\author{Wim R.M. Cardoen \\ Email: \$(prefix)[at]gmail[dot]com \\ where \\ prefix='wcardoen' }
+\date{\today}
+\maketitle
+\thispagestyle{empty}
+% ----------------------------------------------------------------
+\pagestyle{plain}
+\pagenumbering{arabic} 
+\setcounter{page}{1}
+\renewcommand \thesection{\Roman{section}} 
+
+\section{Reproducible science using conda}
+Conda environments can be used to make python software installations reproducible, i.e. to generate 
+python environments which bear identical version numbers for their python packages. 
+
+In a first step, we will create an environment using the latest version of miniconda3\footnote{can be exchanged interchangeably for anaconda3 for every
+instance in the document} 
+installed on a machine running the Ubuntu 18.04 OS. Subsequently, the settings of this newly created conda environment will be exported into yaml file.
+In the final step, we will load the settings in a new conda environment on a CHPC node running the Rocky8 OS.
+
+\subsection{Creation of the reproducible environment} 
+
+We assume that miniconda3 has been installed and has been
+set up in such a way that it allows to support more than one conda environment (the default conda environment 
+bears the name \texttt{base}).
+
+The most common way to support multiple conda environments is to invoke \lstinline[language=bash]{conda init} post the miniconda3 installation.
+Unfortunately, this procedure modifies a user's existing startup shell \lstinline[language=bash]{.bashrc/.tcshrc} on a \textbf{permanent} basis.
+For people who are using the LMOD modules setup, we recommend \href{https://github.com/CHPC-UofU/anaconda-modules/blob/master/miniconda3/latest.lua}{CHPC's lua module template} which supports multiple conda environments and 
+does not modify the user's shell permanently. 
+
+In the following coding block, an environment with the name \texttt{genscience} is created. The command \texttt{conda activate genscience} allows
+one to enter the \texttt{genscience} environment. Subsequent an array of Python packages (\texttt{numpy,\ldots, statsmodels}) as well as 
+\texttt{texlive-core} will be installed in the \texttt{genscience} environment.
+The command \lstinline[language=bash]{conda deactivate} forces one to leave the \texttt{genscience} environment and return to the \texttt{base}
+environment.
+
+\begin{lstlisting}[language=bash]
+# Create a simple env: genscience
+module load py39_4.12.0
+# Create a simple env: genscience
+conda create -y -n genscience 
+# Activate the genscience environment
+conda activate genscience
+# Install an array of packages
+conda install -y -c anaconda numpy scipy matplotlib 
+conda install -y -c anaconda pandas scikit-learn scikit-learn-intelex
+conda install -y -c anaconda jupyter
+conda install -y -c anaconda xarray
+conda install -y -c bokeh bokeh
+conda install -y -c conda-forge dask
+conda install -y -c conda-forge gdal
+conda install -y -c conda-forge jupyterlab voila
+conda install -y -c conda-forge jupyterlab-latex
+conda install -y -c conda-forge scikit-image
+conda install -y -c conda-forge statsmodels
+conda install -y -c conda-forge texlive-core
+# Deactivate the genscience environment
+conda deactivate
+\end{lstlisting}
+
+The command \texttt{conda list} displays the environments that are accessible to the miniconda3 installation.
+The symbol ('*') prepend the directory where the currently activated environment is stored.
+
+
+\begin{lstlisting}[language=bash]
+# Conda List:
+# ----------
+conda list
+
+# Find all the Conda envs:
+# -----------------------
+base                  *  /home/sleipnir/software/pkg/mini3/py39_4.12.0
+genscience               /home/sleipnir/software/pkg/mini3/py39_4.12.0/envs/genscience
+
+
+sleipnir@ragnarok:~$ conda activate genscience
+(genscience) sleipnir@ragnarok:~$ conda env list
+# conda environments:
+#
+base                     /home/sleipnir/software/pkg/mini3/py39_4.12.0
+genscience            *  /home/sleipnir/software/pkg/mini3/py39_4.12.0/envs/genscience
+conda deactivate
+\end{lstlisting}
+
+\subsection{Export of a conda environment}
+The information of the \texttt{genscience} environment can be easily stored in a file.
+The following command stores the details of the \texttt{genscience} environment in the 
+yaml file \texttt{genscience.py39.yml}.
+
+\begin{lstlisting}[language=bash]
+# Export the genscience env into a YAML file:
+# -------------------------------------------
+conda env export -v -n genscience -f genscience.py39.yml
+\end{lstlisting}
+
+\subsection{Reproduce an environement based on a YAML file}
+In what follows we will recreate our environment on a new machine.
+After loading an existing anaconda distribution we are able to generate a
+Python environment based on the previously exported yaml file.
+
+\begin{lstlisting}[language=bash]
+module use ~/EigenModules
+module load myanaconda/2020.11
+
+[u0253283@kingspeak5:~]$ conda env list
+# conda environments:
+#
+base                  *  /uufs/chpc.utah.edu/common/home/u0253283/software/pkg/anaconda3/2020.11
+
+conda env create -n genscience -f $HOME/genscience.py39.yml
+
+(genscience) [u0253283@kingspeak5:~]$ python3
+Python 3.10.4 (main, Mar 31 2022, 08:41:55) [GCC 7.5.0] on linux
+Type "help", "copyright", "credits" or "license" for more information.
+>>> import numpy as np
+>>> np.__version__
+'1.22.3'
+>>> import statsmodels
+>>> statsmodels.__version__
+'0.13.2'
+
+\end{lstlisting}
+
+
+% ----------------------------------------------------------------
+\bibliographystyle{alpha}
+\bibliography{ana}
+\end{document}
+% ----------------------------------------------------------------
