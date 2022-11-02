@@ -62,14 +62,17 @@ In the final step, we will load the settings in a new conda environment on a CHP
 
 \subsection{Creation of the reproducible environment} 
 
-We assume that miniconda3 has been installed and has been
-set up in such a way that it allows to support more than one conda environment (the default conda environment 
-bears the name \texttt{base}).
+We assume that miniconda3 has been installed and has been set up in such a way that it allows to support 
+more than one conda environment (the default conda environment bears the name \texttt{base}).
 
 The most common way to support multiple conda environments is to invoke \lstinline[language=bash]{conda init} post the miniconda3 installation.
-Unfortunately, this procedure modifies a user's existing startup shell \lstinline[language=bash]{.bashrc/.tcshrc} on a \textbf{permanent} basis.
-For people who are using the LMOD modules setup, we recommend \href{https://github.com/CHPC-UofU/anaconda-modules/blob/master/miniconda3/latest.lua}{CHPC's lua module template} which supports multiple conda environments and 
-does not modify the user's shell permanently. 
+Unfortunately, this procedure modifies a user's existing startup shell (\lstinline[language=bash]{.bashrc/.tcshrc}) on a \textbf{permanent} basis: 
+it appends a block of shell code in the startup shell and forces the latest miniconda3 installation to become the default.
+At best, this approach may serve an individual user, but it is not apt for CHPC's cluster environment.
+
+Therefore, we strongly recommend to use \href{https://github.com/CHPC-UofU/anaconda-modules/blob/master/miniconda3/latest.lua}{CHPC's lua module template}
+which does not modify the startup shell, supports multiple conda environments and allows the user the flexibility to maintain different miniconda 
+distributions next to one another.
 
 In the following coding block, an environment with the name \texttt{genscience} is created. The command \texttt{conda activate genscience} allows
 one to enter the \texttt{genscience} environment. Subsequent an array of Python packages (\texttt{numpy,\ldots, statsmodels}) as well as 
