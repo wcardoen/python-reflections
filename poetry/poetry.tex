@@ -1,6 +1,5 @@
 \documentclass[10pt]{article}
 \usepackage[english]{babel} % Language to be used
-\usepackage{natbib}
 \usepackage{url}
 \usepackage{hyperref}
 \usepackage{listings}
@@ -32,6 +31,12 @@
 }
 
 \newcommand{\POETRY}{\texttt{Poetry}}
+\DeclareUnicodeCharacter{25CF}{$\bullet$}
+\DeclareUnicodeCharacter{251C}{\mbox{\kern.23em
+  \vrule height2.2exdepth1exwidth.4pt\vrule height2.2ptdepth-1.8ptwidth.23em}}
+\DeclareUnicodeCharacter{2500}{\mbox{\vrule height2.2ptdepth-1.8ptwidth.5em}}
+\DeclareUnicodeCharacter{2514}{\mbox{\kern.23em
+  \vrule height2.2exdepth-1.8ptwidth.4pt\vrule height2.2ptdepth-1.8ptwidth.23em}}
 
 % Parameters to the margins 
 \setlength{\topmargin}{-0.50in}
@@ -42,7 +47,7 @@
 
 
 \begin{document}
-\title{\centering{Poetry}}
+\title{\centering{Poetry\\\small{Man will Wahrheit, man will Wirklichkeit und verdirbt dadurch die Poesie. (Johann Wolfgang von Goethe)}}}
 \author{Wim R.M. Cardoen \\ Email: \$(prefix)[at]gmail[dot]com \\ where \\ prefix='wcardoen' }
 \date{\today}
 \maketitle
@@ -53,30 +58,298 @@
 \setcounter{page}{1}
 \renewcommand \thesection{\Roman{section}} 
 
-In the following paragraphs we discuss the \POETRY\\,\cite{POETRY:2023} tool which handles
-dependency management and packaging in Python.
-The installation of \POETRY\ requires Python\,$>3.8$, but the tool is available for the \texttt{Linux},
-\texttt{MacOS}, \texttt{Windows} OS.
-All code below was executed on an laptop running on an \texttt{Ubuntu $22.04$} OS, Python $3.10.12$ 
+In the following paragraphs we discuss the \POETRY\ tool \cite{POETRY:2023} which handles
+dependency management and packaging in Python. The installation of \POETRY\ requires Python\,$>3.8$, 
+but the tool is available for the \texttt{Linux}, \texttt{MacOS}, \texttt{Windows} OS.
+All code below was executed on an laptop running the \texttt{Ubuntu $22.04$} OS, Python $3.10.12$ 
 and \texttt{Lmod} $8.7.31$.
 
 \section*{Introduction}
-Why poetry?
+\POETRY\ is a tool which allows you to:
+\begin{itemize}
+	\item perform dependency management
+        \item build \& package projects
+        \item publish your projects		
+\end{itemize}		
 
-\section{Installation of }
-Here comes the installation of Poetry
+\section{Installation of the Poetry tool}
+The installation of \POETRY\ requires the retrieval of its installation script. By default the \POETRY\ executable 
+(\texttt{poetry}) will be installed in the directory \texttt{\$HOME/.local/bin/}. 
+You can install the \texttt{poetry} in another location 
+as long as the environmental variable \texttt{POETRY\_HOME} has been defined.
+\begin{lstlisting}[language=bash]
+curl -sSL https://install.python-poetry.org >& driver_poetry.py
+export POETRY_HOME=$HOME/software/pkg/poetry/1.6.1
+python3 driver_poetry.py
+\end{lstlisting}
+If you decide to remove the \POETRY\ tool, you can proceed as follows:
+\begin{lstlisting}[language=bash]
+export POETRY_HOME=$HOME/software/pkg/poetry/1.6.1
+python3 driver_poetry.py --uninstall
+\end{lstlisting}
+Subsequently, a \texttt{lua} module file (\texttt{LMOD}) was created to load \POETRY\ :
+\begin{lstlisting}[language=bash]
+sleipnir@x1:~$ module load poetry
+sleipnir@x1:~$ which poetry
+/home/sleipnir/software/pkg/poetry/1.6.1/bin/poetry
+sleipnir@x1:~$ poetry --version
+Poetry (version 1.6.1)
+\end{lstlisting}
+The invocation of the \texttt{poetry} executable without any subcommands/options lists all \POETRY\ subcommands.
 
 \section{Creation of a new Project}
-Creation of a new project
+Invoking the \texttt{poetry new} command followed by a string creates a new project bearing the name of the string.
+\begin{lstlisting}[language=bash]
+sleipnir@x1:~$ poetry new chpc-demo
+  Created package chpc_demo in chpc-demo
+\end{lstlisting}
+The new project has the following directory structure:
+\begin{lstlisting}[language=bash]
+chpc-demo/
+    chpc_demo/
+         __init__.py
+    pyproject.toml
+    README.md
+    tests/
+         __init__.py
+\end{lstlisting}
+The newly created python project bears the name \texttt{chpc\_demo} i.e.\;the hyphen in the project name has been 
+replaced by an underscore (python does not support hyphen tokens in package names).
+The newly created project also contains two directories i.e.\;\texttt{chpc\_demo} (source code properly) and 
+the directory \texttt{tests} (potential test code). By adding the \texttt{--src} flag to the 
+\lstinline[language=bash]{python new} command, the source directory will bear the name \texttt{src}. 
+In the latter case, the directory structure \texttt{chpc\_demo} is to be found 
+under \texttt{src}. 
+\begin{lstlisting}[language=bash]
+poetry new --src chpc-demo
+\end{lstlisting}
+The newly generated \texttt{toml}\cite{TOML:2023} file \texttt{pyproject.toml} contains the minimal amount of information to create a working python package:
+\begin{verbatim}
+[tool.poetry]
+name = "chpc-demo"
+version = "0.1.0"
+description = ""
+authors = ["Your Name <you@example.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+\end{verbatim}	
+Some of the blocks in the \texttt{toml} file can be created/changed by
+\texttt{poetry} commands (vide infra). However, most fields/blocks can only be manually modified using an editor. 
+In the \texttt{pyproject.toml} file the fields \texttt{name}, \texttt{version}, \texttt{description}, \texttt{authors} are mandatory.
+We further notice the field \texttt{python = "\textasciicircum3.10"}. \texttt{Toml} files adhere to a particular syntax (Semantic Versioning)\,\cite{SEMANVER:2023}.
+According to its rules, 
+\texttt{\textasciicircum3.10} implies \texttt{3.10} and higher but \textbf{not} \texttt{4.00} (which currently does not exist). 
+The field name \texttt{python} was initialized to \texttt{\textasciicircum3.10} (first found by on \texttt{\$PATH}).
+
+In case you want to use an existing pre-populated directory named \texttt{mycode} you need to invoke the \texttt{poetry init} command:
+\begin{lstlisting}[language=bash]
+cd mycode
+poetry init
+\end{lstlisting}
 
 \section{Add external dependencies}
-Add external dependencies
+After the creation or initialization of the project existing python packages can be added to the new project.
+These packages will be inserted to a virtual environment within the new project. First, make sure you have entered 
+the project directory.
+You can either explicitly create the virtual environment prior to the addition of the packages i.e.\;by using the 
+command poetry \texttt{poetry env use python3} or by using the absolute path to the executable \texttt{poetry env use /usr/bin/python3}.
+
+If you don't create a virtual environment prior to the addition process, a poetry virtual environment 
+will be created associated to the project when you start to add packages.
+The command \texttt{poetry env info} displays information on the current \texttt{poetry} virtual environment.
+\begin{lstlisting}[language=bash]
+sleipnir@x1:~/chpc-demo$ poetry env info
+Virtualenv
+Python:         3.10.12
+Implementation: CPython
+Path:           /home/sleipnir/.cache/pypoetry/virtualenvs/chpc-demo-5_MZDma8-py3.10
+Executable:     /home/sleipnir/.cache/pypoetry/virtualenvs/chpc-demo-5_MZDma8-py3.10/bin/python
+Valid:          True
+
+System
+Platform:   linux
+OS:         posix
+Python:     3.10.12
+Path:       /usr
+Executable: /usr/bin/python3.10
+\end{lstlisting}
+
+The command \texttt{poetry add} followed by the package names adds packages to the new project. 
+If you do \textbf{not} specify the version of the package (using the syntax adhered to by \texttt{toml} files) 
+\texttt{poetry} wil \textbf{always} insert 
+the latest version of a package in the virtual environment and the \texttt{toml} file. Unfortunately,
+this behavior can have serious consequences later down the road for users who install your package. 
+In what follows we decided that \texttt{numpy>=1.2} as well as the packages \texttt{black} and \texttt{mypy} were required.
+A succesful execution of the command \texttt{poetry add numpy@\textasciicircum1.2} required the modification of the block:
+\begin{lstlisting}[language=bash]
+python = "^3.10"
+\end{lstlisting}
+into:
+\begin{lstlisting}[language=bash]
+python = "<3.13,>=3.9"
+\end{lstlisting}
+Subsequently the following commands were invoked:
+\begin{lstlisting}[language=bash]
+poetry add numpy@^1.2
+poetry add black mypy --group=dev
+\end{lstlisting}
+The flag \texttt{--group=dev} implies that these packages will be added for the development dependency 
+(which will generate a separate block in the \texttt{toml} file).
+
+Finally, the command \texttt{poetry install} installs the packages in the virtual environment. 
+The command \texttt{poetry show --tree} displays info
+on the installed packages in a tree form.
+
+\begin{verbatim}
+sleipnir@x1:~/chpc-demo$ poetry show --tree
+black 23.10.1 The uncompromising code formatter.
+├── click >=8.0.0
+│   └── colorama * 
+├── mypy-extensions >=0.4.3
+├── packaging >=22.0
+├── pathspec >=0.9.0
+├── platformdirs >=2
+├── tomli >=1.1.0
+└── typing-extensions >=4.0.1
+mypy 1.6.1 Optional static typing for Python
+├── mypy-extensions >=1.0.0
+├── tomli >=1.1.0
+└── typing-extensions >=4.1.0
+numpy 1.26.1 Fundamental package for array computing in Python
+\end{verbatim}
+Note that \texttt{numpy 1.26.1} was installed in the newly created virtual environment. 
+However, the corresponding \texttt{toml} file contains:
+\begin{lstlisting}[language=bash]
+numpy = "^1.2"
+\end{lstlisting}
+This requirement will ensure that the installation of our package will \textbf{not} overwrite existing 
+installations of \texttt{numpy} as long as the installed version of \texttt{numpy>=1.2} and \texttt{numpy<2.0}.
+
+The new package requires the existence of a binary \texttt{genmycdf}. In order to accomodate this feature the following block of 
+code had to be manually inserted in the \texttt{toml} file:
+\begin{lstlisting}[language=bash]
+[tool.poetry.scripts]
+genmycdf = "chpc_demo.run_extwiener:run"
+\end{lstlisting}
+
+
+\section{Accessing the code in the package}
+The code in the newly created package can be accessed directly by spawning a shell (\texttt{poetry shell}):
+\begin{lstlisting}[language=bash]
+sleipnir@x1:~/chpc-demo$ poetry shell 
+Spawning shell within /home/sleipnir/.cache/pypoetry/virtualenvs/chpc-demo-5_MZDma8-py3.10
+. /home/sleipnir/.cache/pypoetry/virtualenvs/chpc-demo-5_MZDma8-py3.10/bin/activate
+sleipnir@x1:~/chpc-demo$ . /home/sleipnir/.cache/pypoetry/virtualenvs/chpc-demo-5_MZDma8-py3.10/bin/activate
+(chpc-demo-py3.10) sleipnir@x1:~/chpc-demo$ python3
+Python 3.10.12 (main, Jun 11 2023, 05:26:28) [GCC 11.4.0] on linux
+Type "help", "copyright", "credits" or "license" for more information.
+>>> import numpy as np
+>>> np.__version__
+'1.26.1'
+\end{lstlisting}
+or indirectly by invoking 
+the \texttt{poetry run} command:
+\begin{lstlisting}[language=bash]
+sleipnir@x1:~/chpc-demo$ poetry run python3 -c "import numpy as np; print(np.__version__)"
+1.26.1
+\end{lstlisting}
+
+The executable \texttt{genmycdf} can also be tested:
+\begin{lstlisting}[language=bash]
+sleipnir@x1:~/chpc-demo$ poetry shell
+Spawning shell within /home/sleipnir/.cache/pypoetry/virtualenvs/chpc-demo-5_MZDma8-py3.10
+sleipnir@x1:~/chpc-demo$ . /home/sleipnir/.cache/pypoetry/virtualenvs/chpc-demo-5_MZDma8-py3.10/bin/activate
+(chpc-demo-py3.10) sleipnir@x1:~/chpc-demo$ python3
+Python 3.10.12 (main, Jun 11 2023, 05:26:28) [GCC 11.4.0] on linux
+Type "help", "copyright", "credits" or "license" for more information.
+>>> quit()
+(chpc-demo-py3.10) sleipnir@x1:~/chpc-demo$ genmycdf --help
+usage: genmycdf [-h] --numinter NUMINTER --numpaths NUMPATHS [--kappa KAPPA] [--seed SEED] --outfile OUTFILE
+
+Extended Wiener process:
+
+options:
+  -h, --help            show this help message and exit
+  --numinter NUMINTER, -i NUMINTER
+                        #Intervals in [0,1]
+  --numpaths NUMPATHS, -p NUMPATHS
+                        #Paths/trajectories (i.e. repeats)
+  --kappa KAPPA, -k KAPPA
+                        Value for kappa [0.35]
+  --seed SEED, -s SEED  Seed for the number generator [12345]
+  --outfile OUTFILE, -o OUTFILE
+                        Output file (.npz)
+(chpc-demo-py3.10) sleipnir@x1:~/chpc-demo$ exit
+exit
+\end{lstlisting}
 
 \section{Build the package}
-Build a package
+The building of a package is very common if you plan to share your code with the wider world.
+In order to perform the build, execute \texttt{poetry build}:
+\begin{lstlisting}[language=bash]
+sleipnir@x1:~/chpc-demo$ poetry build
+Building chpc-demo (0.1.0)
+  - Building sdist
+  - Built chpc_demo-0.1.0.tar.gz
+  - Building wheel
+  - Built chpc_demo-0.1.0-py3-none-any.whl
+\end{lstlisting}
+A compressed source code and a wheel file are built.
+Both can be used to do an installation, although the installation of a wheel file will be faster
+especially if the new package contains code which needs compilation.
 
 \section{Publish the package}
-Publish a package
+A lot of Python packages can be found on \href{https://pypi.org/}{https://pypi.org/}. 
+Howver, there is a website to test Python package publishing: \href{https://test.pypi.org}{https://test.pypi.org}.
+Prior to its use one needs to register and create a token for the package one wants to publish.
+
+After the token has been created on the \texttt{https://test.pypi.org} website the current virtual environment 
+needs the information to deliver its content.
+\begin{lstlisting}[language=bash]
+sleipnir@x1:~/chpc-demo$ poetry config repositories.test-pypi https://test.pypi.org/legacy/
+sleipnir@x1:~/chpc-demo$ poetry config pypi-token.test-pypi xyz
+\end{lstlisting}
+where \texttt{xyz} stands for the token provided by \texttt{https://test.pypi.org}.
+
+The package can now be published as follows:
+\begin{lstlisting}[language=bash]
+sleipnir@x1:~/chpc-demo$ poetry publish -r test-pypi
+Publishing chpc-demo (0.1.0) to test-pypi
+ - Uploading chpc_demo-0.1.0-py3-none-any.whl 100%
+ - Uploading chpc_demo-0.1.0.tar.gz 100%
+\end{lstlisting}
+
+\section{Install the newly created package}
+We can now install our newly created package locally. Make sure you leave the \POETRY\ environment.
+\begin{lstlisting}[language=bash]
+sleipnir@x1:~$ module purge
+sleipnir@x1:~$ module load anaconda3
+sleipnir@x1:~$ pip install -i https://test.pypi.org/simple/ chpc-demo
+Looking in indexes: https://test.pypi.org/simple/
+Collecting chpc-demo
+  Obtaining dependency information for chpc-demo from https://test-files.pythonhosted.org/packages/9c/c3/432e8df10a5db0e3d6b6963c41638f8b9e6b7b24d81fd759932e0dfa7d3e/chpc_demo-0.1.0-py3-none-any.whl.metadata
+  Downloading https://test-files.pythonhosted.org/packages/9c/c3/432e8df10a5db0e3d6b6963c41638f8b9e6b7b24d81fd759932e0dfa7d3e/chpc_demo-0.1.0-py3-none-any.whl.metadata (664 bytes)
+Requirement already satisfied: numpy<2.0,>=1.2 in ./software/pkg/anaconda3/2023.09/lib/python3.11/site-packages (from chpc-demo) (1.24.3)
+Downloading https://test-files.pythonhosted.org/packages/9c/c3/432e8df10a5db0e3d6b6963c41638f8b9e6b7b24d81fd759932e0dfa7d3e/chpc_demo-0.1.0-py3-none-any.whl (3.4 kB)
+Installing collected packages: chpc-demo
+Successfully installed chpc-demo-0.1.0
+\end{lstlisting}
+From the installation output, it is obvious that the locally installed version of \texttt{numpy 1.24.3} satisfied the requirements in the \texttt{toml} file
+and therefore wasn't overwritten by a more recent version of the \texttt{numpy} package.
+
+We are now ready to use the newly installed package:
+\begin{lstlisting}[language=bash]
+sleipnir@x1:~$ python3
+Python 3.11.5 (main, Sep 11 2023, 13:54:46) [GCC 11.2.0] on linux
+Type "help", "copyright", "credits" or "license" for more information.
+>>> from chpc_demo import extwiener
+\end{lstlisting}
 
 % ----------------------------------------------------------------
 \bibliographystyle{alpha}
