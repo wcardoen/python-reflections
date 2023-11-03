@@ -7,7 +7,7 @@
 
 \hypersetup{
   pdftitle={Poetry},
-  pdfauthor={Wim R.M. Cardoen},
+  pdfauthor={Wim R.M. Cardoen, PhD.},
   pdfpagelayout=SinglePage,
   bookmarks=false,
   citecolor=black,
@@ -48,7 +48,7 @@
 
 \begin{document}
 \title{\centering{Poetry\\\small{Man will Wahrheit, man will Wirklichkeit und verdirbt dadurch die Poesie. (Johann Wolfgang von Goethe)}}}
-\author{Wim R.M. Cardoen \\ Email: \$(prefix)[at]gmail[dot]com \\ where \\ prefix='wcardoen' }
+\author{Wim R.M. Cardoen, PhD \\ Email: \$(prefix)[at]gmail[dot]com \\ where \\ prefix='wcardoen' }
 \date{\today}
 \maketitle
 \thispagestyle{empty}
@@ -59,10 +59,10 @@
 \renewcommand \thesection{\Roman{section}} 
 
 In the following paragraphs we discuss the \POETRY\ tool \cite{POETRY:2023} which handles
-dependency management and packaging in Python. The installation of \POETRY\ requires Python\,$>3.8$, 
+dependency management and packaging in Python. The installation of \POETRY\ requires \texttt{Python}$>3.8$, 
 but the tool is available for the \texttt{Linux}, \texttt{MacOS}, \texttt{Windows} OS.
-All code below was executed on an laptop running the \texttt{Ubuntu $22.04$} OS, Python $3.10.12$ 
-and \texttt{Lmod} $8.7.31$.
+All code below was executed on an laptop running the \texttt{Ubuntu $22.04$} OS, \texttt{Python}\,$3.10.12$ 
+and \texttt{Lmod}\,$8.7.31$.
 
 \section*{Introduction}
 \POETRY\ is a tool which allows you to:
@@ -87,7 +87,7 @@ If you decide to remove the \POETRY\ tool, you can proceed as follows:
 export POETRY_HOME=$HOME/software/pkg/poetry/1.6.1
 python3 driver_poetry.py --uninstall
 \end{lstlisting}
-Subsequently, a \texttt{lua} module file (\texttt{LMOD}) was created to load \POETRY\ :
+Subsequently, a \texttt{lua} module file (\texttt{LMOD}) was created to load \POETRY\ using \texttt{Lmod}:
 \begin{lstlisting}[language=bash]
 sleipnir@x1:~$ module load poetry
 sleipnir@x1:~$ which poetry
@@ -123,7 +123,7 @@ under \texttt{src}.
 \begin{lstlisting}[language=bash]
 poetry new --src chpc-demo
 \end{lstlisting}
-The newly generated \texttt{toml}\cite{TOML:2023} file \texttt{pyproject.toml} contains the minimal amount of information to create a working python package:
+The newly generated \texttt{toml}\,\cite{TOML:2023} file \texttt{pyproject.toml} contains the minimal amount of information to create a working python package:
 \begin{verbatim}
 [tool.poetry]
 name = "chpc-demo"
@@ -155,7 +155,7 @@ poetry init
 
 \section{Add external dependencies}
 After the creation or initialization of the project existing python packages can be added to the new project.
-These packages will be inserted to a virtual environment within the new project. First, make sure you have entered 
+These packages will be inserted in a virtual environment within the new project. First, make sure you have entered 
 the project directory.
 You can either explicitly create the virtual environment prior to the addition of the packages i.e.\;by using the 
 command \lstinline[language=bash]{poetry env use python3} or by using the absolute path to the executable \lstinline[language=bash]{poetry env use /usr/bin/python3}.
@@ -181,11 +181,10 @@ Executable: /usr/bin/python3.10
 \end{lstlisting}
 
 The command \lstinline[language=bash]{poetry add} followed by the package names adds packages to the new project. 
-If you do \textbf{not} specify the version of the package (using the syntax adhered to by \texttt{toml} files) 
+If you do \textbf{not} specify the version of the package (using the syntax adhered to by \texttt{toml}) 
 \lstinline[language=bash]{poetry} wil \textbf{always} insert 
-the latest version of a package in the virtual environment and the \texttt{toml} file. Unfortunately,
-this behavior can have serious consequences later down the road for users who install your package. 
-In what follows we decided that \texttt{numpy>=1.2} as well as the packages \texttt{black} and \texttt{mypy} were required.
+the latest version of a package in the virtual environment \textbf{and} the \texttt{toml} file. 
+In what follows we decided that \texttt{numpy>=1.2}, \texttt{black} and \texttt{mypy} were to be required.
 A succesful execution of the command \texttt{poetry add numpy@\textasciicircum1.2} required the modification of the block:
 \begin{lstlisting}[language=bash]
 python = "^3.10"
@@ -255,7 +254,7 @@ sleipnir@x1:~/chpc-demo$ poetry run python3 -c "import numpy as np; print(np.__v
 1.26.1
 \end{lstlisting}
 
-The executable \texttt{genmycdf} can also be tested:
+The executable \texttt{genmycdf} can also be tested out:
 \begin{lstlisting}[language=bash]
 sleipnir@x1:~/chpc-demo$ poetry shell
 Spawning shell within /home/sleipnir/.cache/pypoetry/virtualenvs/chpc-demo-5_MZDma8-py3.10
@@ -285,7 +284,7 @@ exit
 \end{lstlisting}
 
 \section{Writing testing code}
-When a \POETRY\ package is created the \texttt{tests} directory is generated as well.
+When a \POETRY\ package is created the \texttt{tests} directory is also generated.
 There are several testing frames available for Python developers: \href{https://docs.pytest.org/en/stable/}{pytest}\;\cite{PYTEST:2023}, 
 \href{https://docs.python.org/3/library/unittest.html}{unittest}\;\cite{UNITTEST:2023}, \ldots.
 In what follows we will use the \texttt{pytest} tool.
@@ -308,7 +307,7 @@ Package operations: 4 installs, 0 updates, 0 removals
 Writing lock file
 \end{lstlisting}
 
-The \texttt{pyproject.toml} will be updated as well.
+The \texttt{pyproject.toml} file will be updated as well.
 \begin{lstlisting}[language=bash]
 [tool.poetry.group.dev.dependencies]
 black = "^23.10.1"
@@ -316,8 +315,7 @@ mypy = "^1.6.1"
 pytest = "^7.4.3"
 \end{lstlisting}
 
-You are now in a position to provide tests/examples to \texttt{pytest}. The file \texttt{test\_extwiener.py} 
-contains a trivial test:
+A trivial test was added to the file \texttt{tests/test\_extwiener.py} with the following content:
 \begin{lstlisting}[language=python]
 import chpc_demo.extwiener as ext
 def test_one():
@@ -330,7 +328,7 @@ def test_one():
 Note:
 \begin{itemize}
     \item if the \POETRY\ project was created using the \texttt{poetry new --src chpc-demo} command the first line
-	    of the file \texttt{test\_extwiener.py} needs to modified into: \lstinline[language=python]{import src.chpc_demo.extwiener as ext}.
+	    of the file \texttt{test\_extwiener.py} needs to be modified into: \lstinline[language=python]{import src.chpc_demo.extwiener as ext}.
 \end{itemize}		
 
 
@@ -362,16 +360,16 @@ Building chpc-demo (0.1.0)
   - Built chpc_demo-0.1.0-py3-none-any.whl
 \end{lstlisting}
 A compressed source code and a wheel file are built.
-Both can be used to do an installation, although the installation of a wheel file will be faster
+Both can be used to do an installation, although the installation of a \href{https://wheel.readthedocs.io/en/stable/}{wheel} file will be faster
 especially if the new package contains code which needs compilation.
 
 \section{Publish the package}
 A lot of Python packages can be found on \href{https://pypi.org/}{https://pypi.org/}. 
-Howver, there is a website to test Python package publishing: \href{https://test.pypi.org}{https://test.pypi.org}.
+However, there is an analogue/mock up to test Python package publishing: \href{https://test.pypi.org}{https://test.pypi.org}.
 Prior to its use one needs to register and create a token for the package one wants to publish.
 
 After the token has been created on the \texttt{https://test.pypi.org} website the current virtual environment 
-needs the information to deliver its content.
+needs that information to deliver its content to \texttt{https://test.pypi.org}.
 \begin{lstlisting}[language=bash]
 sleipnir@x1:~/chpc-demo$ poetry config repositories.test-pypi https://test.pypi.org/legacy/
 sleipnir@x1:~/chpc-demo$ poetry config pypi-token.test-pypi xyz
@@ -401,7 +399,7 @@ Downloading https://test-files.pythonhosted.org/packages/9c/c3/432e8df10a5db0e3d
 Installing collected packages: chpc-demo
 Successfully installed chpc-demo-0.1.0
 \end{lstlisting}
-From the installation output, it is obvious that the locally installed version of \texttt{numpy 1.24.3} satisfied the requirements in the \texttt{toml} file
+From the installation output, it is obvious that the already installed version of \texttt{numpy 1.24.3} satisfied the requirements in the \texttt{toml} file
 and therefore wasn't overwritten by a more recent version of the \texttt{numpy} package.
 
 We are now ready to use the newly installed package:
