@@ -98,7 +98,7 @@ Poetry (version 1.6.1)
 The invocation of the \texttt{poetry} executable without any subcommands/options lists all \POETRY\ subcommands.
 
 \section{Creation of a new Project}
-Invoking the \texttt{poetry new} command followed by a string creates a new project bearing the name of the string.
+Invoking the \lstinline[language=bash]{poetry new} command followed by a string creates a new project bearing the name of the string.
 \begin{lstlisting}[language=bash]
 sleipnir@x1:~$ poetry new chpc-demo
   Created package chpc_demo in chpc-demo
@@ -116,8 +116,8 @@ chpc-demo/
 The newly created python project bears the name \texttt{chpc\_demo} i.e.\;the hyphen in the project name has been 
 replaced by an underscore (python does not support hyphen tokens in package names).
 The newly created project also contains two directories i.e.\;\texttt{chpc\_demo} (source code properly) and 
-the directory \texttt{tests} (potential test code). By adding the \texttt{--src} flag to the 
-\lstinline[language=bash]{python new} command, the source directory will bear the name \texttt{src}. 
+the directory \texttt{tests} (potential test code). By adding the \lstinline[language=bash]{--src} flag to the 
+\lstinline[language=bash]{poetry new} command, the source directory will bear the name \texttt{src}. 
 In the latter case, the directory structure \texttt{chpc\_demo} is to be found 
 under \texttt{src}. 
 \begin{lstlisting}[language=bash]
@@ -147,7 +147,7 @@ According to its rules,
 \texttt{\textasciicircum3.10} implies \texttt{3.10} and higher but \textbf{not} \texttt{4.00} (which currently does not exist). 
 The field name \texttt{python} was initialized to \texttt{\textasciicircum3.10} (first found by on \texttt{\$PATH}).
 
-In case you want to use an existing pre-populated directory named \texttt{mycode} you need to invoke the \texttt{poetry init} command:
+In case you want to use an existing pre-populated directory named \texttt{mycode} you need to invoke the \lstinline[language=bash]{poetry init} command:
 \begin{lstlisting}[language=bash]
 cd mycode
 poetry init
@@ -158,11 +158,11 @@ After the creation or initialization of the project existing python packages can
 These packages will be inserted to a virtual environment within the new project. First, make sure you have entered 
 the project directory.
 You can either explicitly create the virtual environment prior to the addition of the packages i.e.\;by using the 
-command poetry \texttt{poetry env use python3} or by using the absolute path to the executable \texttt{poetry env use /usr/bin/python3}.
+command \lstinline[language=bash]{poetry env use python3} or by using the absolute path to the executable \lstinline[language=bash]{poetry env use /usr/bin/python3}.
 
 If you don't create a virtual environment prior to the addition process, a poetry virtual environment 
 will be created associated to the project when you start to add packages.
-The command \texttt{poetry env info} displays information on the current \texttt{poetry} virtual environment.
+The command \lstinline[language=bash]{poetry env info} displays information on the current \lstinline[language=bash]{poetry} virtual environment.
 \begin{lstlisting}[language=bash]
 sleipnir@x1:~/chpc-demo$ poetry env info
 Virtualenv
@@ -180,9 +180,9 @@ Path:       /usr
 Executable: /usr/bin/python3.10
 \end{lstlisting}
 
-The command \texttt{poetry add} followed by the package names adds packages to the new project. 
+The command \lstinline[language=bash]{poetry add} followed by the package names adds packages to the new project. 
 If you do \textbf{not} specify the version of the package (using the syntax adhered to by \texttt{toml} files) 
-\texttt{poetry} wil \textbf{always} insert 
+\lstinline[language=bash]{poetry} wil \textbf{always} insert 
 the latest version of a package in the virtual environment and the \texttt{toml} file. Unfortunately,
 this behavior can have serious consequences later down the road for users who install your package. 
 In what follows we decided that \texttt{numpy>=1.2} as well as the packages \texttt{black} and \texttt{mypy} were required.
@@ -202,27 +202,22 @@ poetry add black mypy --group=dev
 The flag \texttt{--group=dev} implies that these packages will be added for the development dependency 
 (which will generate a separate block in the \texttt{toml} file).
 
-Finally, the command \texttt{poetry install} installs the packages in the virtual environment. 
-The command \texttt{poetry show --tree} displays info
-on the installed packages in a tree form.
+Finally, the command \lstinline[language=bash]{poetry install} installs the packages in the virtual environment. 
+The command \lstinline[language=bash]{poetry show (--tree)} displays info on the installed packages (in a tree form).
 
-\begin{verbatim}
-sleipnir@x1:~/chpc-demo$ poetry show --tree
-black 23.10.1 The uncompromising code formatter.
-├── click >=8.0.0
-│   └── colorama * 
-├── mypy-extensions >=0.4.3
-├── packaging >=22.0
-├── pathspec >=0.9.0
-├── platformdirs >=2
-├── tomli >=1.1.0
-└── typing-extensions >=4.0.1
-mypy 1.6.1 Optional static typing for Python
-├── mypy-extensions >=1.0.0
-├── tomli >=1.1.0
-└── typing-extensions >=4.1.0
-numpy 1.26.1 Fundamental package for array computing in Python
-\end{verbatim}
+\begin{lstlisting}[language=bash]
+sleipnir@x1:~/chpc-demo$ poetry show
+black             23.10.1 The uncompromising code formatter.
+click             8.1.7   Composable command line interface toolkit
+mypy              1.6.1   Optional static typing for Python
+mypy-extensions   1.0.0   Type system extensions for programs checked with the mypy type checker.
+numpy             1.26.1  Fundamental package for array computing in Python
+packaging         23.2    Core utilities for Python packages
+pathspec          0.11.2  Utility library for gitignore style pattern matching of file paths.
+platformdirs      3.11.0  A small Python package for determining appropriate platform-specific dirs, e.g. a "user data dir".
+tomli             2.0.1   A lil' TOML parser
+typing-extensions 4.8.0   Backported and Experimental Type Hints for Python 3.8+
+\end{lstlisting}
 Note that \texttt{numpy 1.26.1} was installed in the newly created virtual environment. 
 However, the corresponding \texttt{toml} file contains:
 \begin{lstlisting}[language=bash]
@@ -240,7 +235,7 @@ genmycdf = "chpc_demo.run_extwiener:run"
 
 
 \section{Accessing the code in the package}
-The code in the newly created package can be accessed directly by spawning a shell (\texttt{poetry shell}):
+The code in the newly created package can be accessed directly by spawning a shell (\lstinline[language=bash]{poetry shell}):
 \begin{lstlisting}[language=bash]
 sleipnir@x1:~/chpc-demo$ poetry shell 
 Spawning shell within /home/sleipnir/.cache/pypoetry/virtualenvs/chpc-demo-5_MZDma8-py3.10
@@ -288,6 +283,72 @@ options:
 (chpc-demo-py3.10) sleipnir@x1:~/chpc-demo$ exit
 exit
 \end{lstlisting}
+
+\section{Writing testing code}
+When a \POETRY\ package is created the \texttt{tests} directory is generated as well.
+There are several testing frames available for Python developers: \href{https://docs.pytest.org/en/stable/}{pytest}\;\cite{PYTEST:2023}, 
+\href{https://docs.python.org/3/library/unittest.html}{unittest}\;\cite{UNITTEST:2023}, \ldots.
+In what follows we will use the \texttt{pytest} tool.
+
+In a first step, we need to add \texttt{pytest} to our virtual environment (in its development part):
+\begin{lstlisting}[language=bash]
+sleipnir@x1:~/chpc-demo$ poetry add --group=dev pytest
+Using version ^7.4.3 for pytest
+
+Updating dependencies
+Resolving dependencies... (0.2s)
+
+Package operations: 4 installs, 0 updates, 0 removals
+
+  Installing exceptiongroup (1.1.3)
+  Installing iniconfig (2.0.0)
+  Installing pluggy (1.3.0)
+  Installing pytest (7.4.3)
+
+Writing lock file
+\end{lstlisting}
+
+The \texttt{pyproject.toml} will be updated as well.
+\begin{lstlisting}[language=bash]
+[tool.poetry.group.dev.dependencies]
+black = "^23.10.1"
+mypy = "^1.6.1"
+pytest = "^7.4.3"
+\end{lstlisting}
+
+You are now in a position to provide tests/examples to \texttt{pytest}. The file \texttt{test\_extwiener.py} 
+contains a trivial test:
+\begin{lstlisting}[language=python]
+import chpc_demo.extwiener as ext
+def test_one():
+    """
+    A simple test
+    """
+    VERSION = "0.4.0"
+    assert ext.__version__ == VERSION
+\end{lstlisting}   
+Note:
+\begin{itemize}
+    \item if the \POETRY\ project was created using the \texttt{poetry new --src chpc-demo} command the first line
+	    of the file \texttt{test\_extwiener.py} needs to modified into: \lstinline[language=python]{import src.chpc_demo.extwiener as ext}.
+\end{itemize}		
+
+
+Once you have generated the test, you can run the test within \POETRY\ by invoking the \lstinline[language=bash]{poetry run pytest} command.
+\begin{lstlisting}[language=bash]
+sleipnir@x1:~/chpc-demo$ poetry run pytest
+===================================================================== test session starts ===================
+platform linux -- Python 3.10.12, pytest-7.4.3, pluggy-1.3.0
+rootdir: /home/sleipnir/chpc-demo
+collected 1 item                                                                                                                                              
+
+tests/test_extwiener.py .                                                                                                                               [100%]
+
+====================================================================== 1 passed in 0.07s ====================
+\end{lstlisting}
+If your test passes succesfully you should get a message like the above one. If one of your tests fails you will be
+informed in a very obvious way.
+
 
 \section{Build the package}
 The building of a package is very common if you plan to share your code with the wider world.
